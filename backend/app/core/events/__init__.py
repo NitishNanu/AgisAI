@@ -1,0 +1,3 @@
+"""
+AegisAI Core Events Package.
+"""

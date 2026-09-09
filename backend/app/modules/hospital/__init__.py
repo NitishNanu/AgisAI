@@ -1,0 +1,1 @@
+﻿"""Hospital module package."""
