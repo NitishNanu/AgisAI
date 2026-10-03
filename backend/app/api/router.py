@@ -26,6 +26,8 @@ from app.modules.resource.router import router as resource_router
 from app.modules.scenario.router import router as scenario_router
 from app.modules.simulation.router import router as simulation_router
 
+from app.modules.external_feeds.router import router as feeds_router
+
 api_router = APIRouter()
 
 # ── Infrastructure ────────────────────────────────────────────────────────
@@ -54,7 +56,9 @@ api_router.include_router(ai_router)
 api_router.include_router(ml_router)
 api_router.include_router(assistant_router)
 
-# ── Platform Intelligence ────────────────────────────────────────────────
+# ── Platform Intelligence & Feeds ────────────────────────────────────────
+api_router.include_router(feeds_router)
 api_router.include_router(analytics_router)
 api_router.include_router(notification_router)
 api_router.include_router(audit_router)
+

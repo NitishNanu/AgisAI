@@ -159,3 +159,25 @@ class OllamaExplanationProvider:
             is_fallback=True,
             latency_ms=round(latency_ms, 2),
         )
+
+    async def generate(self, prompt: str, system_prompt: str = "") -> str:
+        """Raw generation wrapper with fallback."""
+        try:
+            async with httpx.AsyncClient(timeout=self.timeout) as client:
+                payload = {
+                    "model": self.model_name,
+                    "prompt": prompt,
+                    "stream": False,
+                }
+                if system_prompt:
+                    payload["system"] = system_prompt
+                resp = await client.post(f"{self.base_url}/api/generate", json=payload)
+                if resp.status_code == 200:
+                    return resp.json().get("response", "")
+        except Exception:
+            pass
+        return ""
+
+
+ollama_provider = OllamaExplanationProvider()
+

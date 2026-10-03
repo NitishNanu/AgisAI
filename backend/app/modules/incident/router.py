@@ -275,3 +275,51 @@ async def recommended_teams(
         message=f"Ranked {len(teams)} rescue teams.",
     )
 
+
+@router.post(
+    "/auto-discover",
+    response_model=ApiResponse[dict],
+    summary="Auto-detect disaster and discover nearby shelters & rescue teams",
+    description="Takes raw unstructured text, automatically extracts disaster type, geocodes coordinates, and auto-discovers optimal rescue teams, shelters, and hospitals.",
+)
+async def auto_discover_incident(
+    payload: dict,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_active_user),
+) -> ApiResponse[dict]:
+    text = payload.get("text", "")
+    persist = bool(payload.get("persist", False))
+    
+    result = await IncidentService.auto_discover_from_text(
+        db=db,
+        text=text,
+        reporter_id=current_user.id,
+        persist=persist,
+    )
+    
+    # Broadcast to WebSocket if persisted
+    if persist and result.get("detected_disaster", {}).get("incident_id"):
+        try:
+            inc_info = result["detected_disaster"]
+            await ws_manager.broadcast_to_channel(
+                channel="incidents",
+                event_type="INCIDENT_CREATED",
+                data={
+                    "id": inc_info["incident_id"],
+                    "title": f"Auto-Detected: {inc_info['disaster_type']}",
+                    "disaster_type": inc_info["disaster_type"],
+                    "severity": inc_info["severity"],
+                    "latitude": inc_info["latitude"],
+                    "longitude": inc_info["longitude"],
+                    "status": "REPORTED",
+                }
+            )
+        except Exception:
+            pass
+
+    return ApiResponse.ok(
+        data=result,
+        message="Disaster, shelters, and rescue teams auto-discovered successfully.",
+    )
+
+

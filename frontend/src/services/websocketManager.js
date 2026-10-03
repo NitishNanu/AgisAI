@@ -29,6 +29,11 @@ class WebSocketManager {
      * Connect to the AegisAI telemetry stream
      */
     connect(token = null) {
+        // Do NOT attempt connection without a token — the backend requires JWT auth.
+        if (!token) {
+            return;
+        }
+
         if (this.ws && (this.ws.readyState === WebSocket.OPEN || this.ws.readyState === WebSocket.CONNECTING)) {
             return;
         }
@@ -90,7 +95,8 @@ class WebSocketManager {
      * Schedule reconnection with exponential backoff
      */
     scheduleReconnect(token) {
-        if (this.reconnectTimer || this.isExplicitlyClosed) {
+        // No token means nothing to reconnect to — bail out silently.
+        if (!token || this.reconnectTimer || this.isExplicitlyClosed) {
             return;
         }
 

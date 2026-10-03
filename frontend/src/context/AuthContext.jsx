@@ -24,6 +24,8 @@ export function AuthProvider({ children }) {
                 const profile = await authService.getMe();
                 setUser(profile);
                 setToken(storedToken);
+                // Re-connect WebSocket with stored token on page load/refresh
+                wsManager.connect(storedToken);
             } catch (err) {
                 console.warn("[AuthContext] Profile hydration failed, clearing session:", err);
                 authService.logout();
