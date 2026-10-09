@@ -121,6 +121,10 @@ class ScenarioCreateRequest(BaseModel):
     is_template: bool = Field(default=False)
 
 
+# Alias for backward compatibility
+ScenarioCreate = ScenarioCreateRequest
+
+
 class ScenarioUpdateRequest(BaseModel):
     """Partial update payload for a Scenario in DRAFT or READY state."""
     name: Optional[str] = Field(default=None, min_length=3, max_length=200)

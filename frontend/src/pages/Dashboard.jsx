@@ -17,6 +17,7 @@ import WhatIfModal from "../components/Simulation/WhatIfModal";
 import SpawnIncidentModal from "../components/Simulation/SpawnIncidentModal";
 import ScenarioDesigner from "../components/Scenario/ScenarioDesigner";
 import ScenarioListModal from "../components/Scenario/ScenarioListModal";
+import IncidentActionPlanModal from "../components/Disaster/IncidentActionPlanModal";
 import PredictiveDashboard from "../components/Prediction/PredictiveDashboard";
 import AnalyticsDashboard from "../components/Analytics/AnalyticsDashboard";
 import ResourcesPanel from "../components/Resources/ResourcesPanel";
@@ -25,6 +26,7 @@ import { useAuth } from "../context/AuthContext";
 import wsManager from "../services/websocketManager";
 import simulationService from "../services/simulationService";
 import predictionService from "../services/predictionService";
+import incidentService from "../services/incidentService";
 
 import {
     getDisasters,
@@ -46,6 +48,9 @@ function Dashboard() {
     const [isWhatIfOpen, setIsWhatIfOpen] = useState(false);
     const [isSpawnModalOpen, setIsSpawnModalOpen] = useState(false);
     const [isLibraryOpen, setIsLibraryOpen] = useState(false);
+    const [isIAPModalOpen, setIsIAPModalOpen] = useState(false);
+    const [activeIAP, setActiveIAP] = useState(null);
+    const [loadingIAP, setLoadingIAP] = useState(false);
 
     // ── CORE DATA ─────────────────────────────────────────────────────────
     const [disasters, setDisasters] = useState([]);
@@ -281,6 +286,21 @@ function Dashboard() {
         }
     }
 
+    // ── GENERATE AI INCIDENT ACTION PLAN (IAP) ─────────────────────────────
+    async function handleOpenIAP(incidentId) {
+        setLoadingIAP(true);
+        setIsIAPModalOpen(true);
+        try {
+            const data = await incidentService.getIncidentIAP(incidentId);
+            setActiveIAP(data);
+        } catch (err) {
+            console.error("IAP generation error:", err);
+            alert(err?.response?.data?.message || err?.message || "Failed to generate Incident Action Plan.");
+        } finally {
+            setLoadingIAP(false);
+        }
+    }
+
     // ── SELECT MISSION ─────────────────────────────────────────────────────
     function handleSelectMission(mission) {
         setSelectedMission(mission);
@@ -499,6 +519,30 @@ function Dashboard() {
                                                 </div>
                                             )}
                                         </div>
+
+                                        <button
+                                            className="action-btn ai-iap-btn"
+                                            style={{
+                                                width: "100%",
+                                                marginTop: 10,
+                                                marginBottom: 10,
+                                                padding: "10px 14px",
+                                                background: "linear-gradient(135deg, #4f46e5, #7c3aed)",
+                                                color: "white",
+                                                fontWeight: 600,
+                                                borderRadius: 8,
+                                                border: "none",
+                                                cursor: "pointer",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                gap: 8,
+                                                boxShadow: "0 4px 12px rgba(99, 102, 241, 0.3)",
+                                            }}
+                                            onClick={() => handleOpenIAP(selectedDisaster.id)}
+                                        >
+                                            <span>🧠</span> AI Incident Action Plan (IAP) & Directives
+                                        </button>
 
                                         <hr className="detail-divider" />
 
@@ -722,6 +766,13 @@ function Dashboard() {
                     setDisasters(fresh);
                     fetchSimulationData();
                 }}
+            />
+            <IncidentActionPlanModal
+                isOpen={isIAPModalOpen}
+                onClose={() => setIsIAPModalOpen(false)}
+                iap={activeIAP}
+                loading={loadingIAP}
+                incidentTitle={selectedDisaster?.title}
             />
         </div>
     );

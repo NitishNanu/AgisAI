@@ -113,6 +113,27 @@ export const scenarioService = {
     async getScenarioSnapshot(id) {
         const response = await api.get(`/scenarios/${id}/snapshot`);
         return response.data?.data || {};
+    },
+
+    /**
+     * AI Scenario Architect: Generate scenario blueprint from natural language prompt
+     * POST /api/v1/agents/scenario/generate
+     */
+    async generateScenarioFromPrompt(prompt, difficultyLevel = "MODERATE") {
+        const response = await api.post("/agents/scenario/generate", {
+            prompt,
+            difficulty_level: difficultyLevel,
+        });
+        return response.data?.data || null;
+    },
+
+    /**
+     * AI Scenario Architect: Run stress test curve and bottleneck forecast
+     * POST /api/v1/agents/scenario/stress-test
+     */
+    async stressTestScenario(payload) {
+        const response = await api.post("/agents/scenario/stress-test", payload);
+        return response.data?.data || null;
     }
 };
 

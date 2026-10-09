@@ -1,7 +1,11 @@
 /**
  * AegisAI Scenario Designer Studio
  * Full-screen modal overlay — a premium visual scenario builder.
- * Features: preset chips, tabbed wizard, live impact preview, validation, launch.
+ * Features:
+ * - AI Scenario Architect: Prompt-to-Blueprint generator
+ * - Preset chips & Tabbed wizard
+ * - AI Stress-Test, casualty surge forecasting & crisis injects timeline
+ * - Live impact preview, validation & Digital Twin execution
  */
 
 import React, { useState, useEffect } from "react";
@@ -9,12 +13,14 @@ import scenarioService from "../../services/scenarioService";
 
 /* ── Section tab definitions ─────────────────────────────── */
 const SECTIONS = [
+    { id: "AI_ARCHITECT",   icon: "✨", label: "AI Architect" },
     { id: "DISASTER",       icon: "🚨", label: "Hazard" },
     { id: "ENVIRONMENT",    icon: "🌦️", label: "Weather" },
     { id: "POPULATION",     icon: "👥", label: "Population" },
     { id: "RESOURCES",      icon: "🚑", label: "Fleet" },
     { id: "MEDICAL",        icon: "🏥", label: "Medical" },
     { id: "INFRASTRUCTURE", icon: "🛣️", label: "Lifelines" },
+    { id: "STRESS_TEST",    icon: "📈", label: "AI Stress-Test" },
     { id: "SIMULATION",     icon: "⚙️", label: "Clock" },
 ];
 
@@ -23,9 +29,25 @@ const SEVERITY_COLORS = {
     HIGH: "#f97316", SEVERE: "#ef4444", CRITICAL: "#a855f7",
 };
 
+const PROMPT_SUGGESTIONS = [
+    "Catastrophic 7.2 magnitude earthquake during rush hour causing commercial building collapses and gas pipeline ignition in Sector 17.",
+    "Severe flash flood and dam overflow after torrential monsoon rain with 3 arterial bridges washed out and clinic cut off.",
+    "Level-4 Chemical tanker explosion with downwind toxic plume drifting toward residential high-rises under gale force winds.",
+    "Major electrical substation fire and cascading blackout knocking out traffic signaling and regional trauma hospital backup grid."
+];
+
 export function ScenarioDesigner({ onScenarioLaunched, onOpenLibrary }) {
     const [presets, setPresets] = useState([]);
-    const [activeSection, setActiveSection] = useState("DISASTER");
+    const [activeSection, setActiveSection] = useState("AI_ARCHITECT");
+
+    // AI Prompt State
+    const [aiPrompt, setAiPrompt] = useState(PROMPT_SUGGESTIONS[0]);
+    const [difficultyLevel, setDifficultyLevel] = useState("MODERATE");
+    const [generatingBlueprint, setGeneratingBlueprint] = useState(false);
+
+    // AI Stress Test State
+    const [stressTestResult, setStressTestResult] = useState(null);
+    const [runningStressTest, setRunningStressTest] = useState(false);
 
     // Core
     const [name, setName] = useState("Urban Seismic Rupture Scenario");
@@ -82,7 +104,7 @@ export function ScenarioDesigner({ onScenarioLaunched, onOpenLibrary }) {
     const [validation, setValidation] = useState(null);
     const [loadingAction, setLoadingAction] = useState(false);
     const [statusMessage, setStatusMessage] = useState(null);
-    const [statusType, setStatusType] = useState("info"); // info | success | error
+    const [statusType, setStatusType] = useState("info");
 
     useEffect(() => {
         scenarioService.getPresets().then(setPresets).catch(console.warn);
@@ -140,36 +162,93 @@ export function ScenarioDesigner({ onScenarioLaunched, onOpenLibrary }) {
         setTimeout(() => setStatusMessage(null), 4000);
     };
 
+    const applyGeneratedConfig = (c) => {
+        if (!c) return;
+        if (c.name) setName(c.name);
+        if (c.description) setDescription(c.description);
+        if (c.disaster) {
+            if (c.disaster.type) setDisasterType(c.disaster.type);
+            if (c.disaster.severity) setSeverity(c.disaster.severity);
+            if (c.disaster.latitude) setLatitude(c.disaster.latitude);
+            if (c.disaster.longitude) setLongitude(c.disaster.longitude);
+            if (c.disaster.radius_km) setRadiusKm(c.disaster.radius_km);
+            if (c.disaster.magnitude) setMagnitude(c.disaster.magnitude);
+            if (c.disaster.depth_km) setDepthKm(c.disaster.depth_km);
+        }
+        if (c.environment) {
+            if (c.environment.weather_preset) setWeatherPreset(c.environment.weather_preset);
+            if (c.environment.temperature_celsius) setTemperature(c.environment.temperature_celsius);
+            if (c.environment.wind_speed_kmh) setWindSpeed(c.environment.wind_speed_kmh);
+            if (c.environment.visibility_km) setVisibility(c.environment.visibility_km);
+        }
+        if (c.population) {
+            if (c.population.count) setPopulationCount(c.population.count);
+            if (c.population.density) setPopulationDensity(c.population.density);
+            if (c.population.vulnerable_percentage) setVulnerablePct(c.population.vulnerable_percentage);
+        }
+        if (c.resources) {
+            if (c.resources.ambulances !== undefined) setAmbulances(c.resources.ambulances);
+            if (c.resources.fire_trucks !== undefined) setFireTrucks(c.resources.fire_trucks);
+            if (c.resources.police_units !== undefined) setPoliceUnits(c.resources.police_units);
+            if (c.resources.rescue_teams !== undefined) setRescueTeams(c.resources.rescue_teams);
+            if (c.resources.drones !== undefined) setDrones(c.resources.drones);
+            if (c.resources.helicopters !== undefined) setHelicopters(c.resources.helicopters);
+        }
+        if (c.hospitals) {
+            if (c.hospitals.total_beds !== undefined) setTotalBeds(c.hospitals.total_beds);
+            if (c.hospitals.icu_beds !== undefined) setIcuBeds(c.hospitals.icu_beds);
+            if (c.hospitals.emergency_capacity_level) setEmergencyLevel(c.hospitals.emergency_capacity_level);
+        }
+        if (c.shelters) {
+            if (c.shelters.capacity !== undefined) setShelterCapacity(c.shelters.capacity);
+            if (c.shelters.initial_occupancy !== undefined) setShelterOccupancy(c.shelters.initial_occupancy);
+        }
+        if (c.infrastructure) {
+            if (c.infrastructure.road_damage_percentage !== undefined) setRoadDamagePct(c.infrastructure.road_damage_percentage);
+            if (c.infrastructure.road_closure_percentage !== undefined) setRoadClosurePct(c.infrastructure.road_closure_percentage);
+            if (c.infrastructure.bridge_damage_percentage !== undefined) setBridgeDamagePct(c.infrastructure.bridge_damage_percentage);
+            if (c.infrastructure.power_outage_percentage !== undefined) setPowerOutagePct(c.infrastructure.power_outage_percentage);
+        }
+    };
+
+    const handleAIGenerate = async () => {
+        if (!aiPrompt || aiPrompt.trim().length < 10) {
+            showStatus("Please enter a descriptive disaster prompt (min 10 chars).", "error");
+            return;
+        }
+        setGeneratingBlueprint(true);
+        try {
+            const blueprint = await scenarioService.generateScenarioFromPrompt(aiPrompt, difficultyLevel);
+            if (blueprint) {
+                applyGeneratedConfig(blueprint);
+                showStatus("✨ AI Blueprint Synthesized! Parameters updated across all tabs.", "success");
+                setActiveSection("DISASTER");
+            }
+        } catch (err) {
+            console.error("AI Scenario generation error:", err);
+            showStatus("Failed to synthesize AI blueprint. Check Ollama/API.", "error");
+        } finally {
+            setGeneratingBlueprint(false);
+        }
+    };
+
+    const handleRunStressTest = async () => {
+        setRunningStressTest(true);
+        try {
+            const payload = buildPayload();
+            const res = await scenarioService.stressTestScenario(payload);
+            setStressTestResult(res);
+            showStatus("📊 Stress test complete! Reviewing casualty curve & bottlenecks.", "success");
+        } catch (err) {
+            console.error("Stress test error:", err);
+            showStatus("Stress test failed.", "error");
+        } finally {
+            setRunningStressTest(false);
+        }
+    };
+
     const applyPreset = (p) => {
-        const c = p.configuration;
-        setName(c.name);
-        setDescription(c.description || "");
-        setDisasterType(c.disaster.type);
-        setSeverity(c.disaster.severity);
-        setLatitude(c.disaster.latitude);
-        setLongitude(c.disaster.longitude);
-        setRadiusKm(c.disaster.radius_km);
-        if (c.disaster.magnitude) setMagnitude(c.disaster.magnitude);
-        setWeatherPreset(c.environment.weather_preset);
-        setTemperature(c.environment.temperature_celsius);
-        setWindSpeed(c.environment.wind_speed_kmh);
-        setPopulationCount(c.population.count);
-        setPopulationDensity(c.population.density);
-        setVulnerablePct(c.population.vulnerable_percentage);
-        setAmbulances(c.resources.ambulances);
-        setFireTrucks(c.resources.fire_trucks);
-        setPoliceUnits(c.resources.police_units);
-        setRescueTeams(c.resources.rescue_teams);
-        setDrones(c.resources.drones);
-        setHelicopters(c.resources.helicopters);
-        setTotalBeds(c.hospitals.total_beds);
-        setIcuBeds(c.hospitals.icu_beds);
-        setShelterCapacity(c.shelters.capacity);
-        setRoadDamagePct(c.infrastructure.road_damage_percentage);
-        setRoadClosurePct(c.infrastructure.road_closure_percentage);
-        setDurationMins(c.simulation.duration_minutes);
-        setSpeedMultiplier(c.simulation.speed);
-        setRandomSeed(c.simulation.random_seed);
+        applyGeneratedConfig(p.configuration);
         showStatus(`✨ Preset applied: ${p.name}`, "success");
     };
 
@@ -220,7 +299,7 @@ export function ScenarioDesigner({ onScenarioLaunched, onOpenLibrary }) {
                     <span className="sd-header-icon">🛠️</span>
                     <div>
                         <h2 className="sd-title">Scenario Designer Studio</h2>
-                        <p className="sd-subtitle">Build, validate & launch reproducible disaster blueprints</p>
+                        <p className="sd-subtitle">Build, validate & launch reproducible disaster blueprints with ScenarioArchitectAgent</p>
                     </div>
                 </div>
                 <button className="sd-library-btn" onClick={onOpenLibrary}>
@@ -298,6 +377,70 @@ export function ScenarioDesigner({ onScenarioLaunched, onOpenLibrary }) {
                     {/* Form Content */}
                     <div className="sd-form-body">
 
+                        {/* AI ARCHITECT PROMPT TAB */}
+                        {activeSection === "AI_ARCHITECT" && (
+                            <div className="sd-form-section">
+                                <div className="sd-section-heading">
+                                    <span>✨</span> AI Scenario Architect (Natural Language Generator)
+                                </div>
+                                <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 16 }}>
+                                    Describe any complex emergency or crisis situation in plain language. ScenarioArchitectAgent
+                                    will synthesize all parameters across hazard, weather, population, fleet, hospitals, and lifelines.
+                                </p>
+
+                                <div className="sd-field-wrap full">
+                                    <label className="sd-label">Prompt Crisis Description</label>
+                                    <textarea
+                                        className="sd-input"
+                                        rows={4}
+                                        value={aiPrompt}
+                                        onChange={(e) => setAiPrompt(e.target.value)}
+                                        placeholder="E.g., Catastrophic earthquake during high tide with multiple bridge collapses and refinery fire..."
+                                    />
+                                </div>
+
+                                <div className="sd-row-2">
+                                    <div className="sd-field-wrap">
+                                        <label className="sd-label">Target Difficulty / Scale</label>
+                                        <select
+                                            className="sd-select"
+                                            value={difficultyLevel}
+                                            onChange={(e) => setDifficultyLevel(e.target.value)}
+                                        >
+                                            <option value="LOW">🟢 LOW — Localized containment</option>
+                                            <option value="MODERATE">🟡 MODERATE — Multi-unit standard crisis</option>
+                                            <option value="SEVERE">🟠 SEVERE — Regional crisis & lifeline stress</option>
+                                            <option value="CATASTROPHIC">💥 CATASTROPHIC — Mass casualty & grid failure</option>
+                                        </select>
+                                    </div>
+                                    <div className="sd-field-wrap" style={{ display: "flex", alignItems: "flex-end" }}>
+                                        <button
+                                            className="sd-btn sd-btn-launch full-width"
+                                            onClick={handleAIGenerate}
+                                            disabled={generatingBlueprint}
+                                        >
+                                            {generatingBlueprint ? <span className="sd-btn-spinner" /> : "🤖"} Synthesize Blueprint
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div className="sd-field-wrap full" style={{ marginTop: 12 }}>
+                                    <label className="sd-label">💡 Or Select a Suggested Scenario Prompt</label>
+                                    <div className="sd-prompt-chips">
+                                        {PROMPT_SUGGESTIONS.map((sug, idx) => (
+                                            <button
+                                                key={idx}
+                                                className="sd-prompt-chip"
+                                                onClick={() => setAiPrompt(sug)}
+                                            >
+                                                {sug}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                         {/* DISASTER HAZARD */}
                         {activeSection === "DISASTER" && (
                             <div className="sd-form-section">
@@ -313,6 +456,7 @@ export function ScenarioDesigner({ onScenarioLaunched, onOpenLibrary }) {
                                             <option value="FIRE">🔥 Industrial Fire</option>
                                             <option value="BUILDING_COLLAPSE">🏚️ Structural Collapse</option>
                                             <option value="GAS_LEAK">☣️ Toxic Gas Leak</option>
+                                            <option value="STORM">🌪️ Cyclone / Severe Storm</option>
                                         </select>
                                     </div>
                                     <div className="sd-field-wrap">
@@ -418,12 +562,12 @@ export function ScenarioDesigner({ onScenarioLaunched, onOpenLibrary }) {
                                             <option value="LOW">🏘️ Low — Suburban / Rural</option>
                                             <option value="MEDIUM">🏙️ Medium — Residential</option>
                                             <option value="HIGH">🌆 High — Urban Core</option>
-                                            <option value="VERY_HIGH">🏢 Very High — Commercial Hub</option>
+                                            <option value="DENSE">🏢 Very High — Commercial Hub</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div className="sd-field-wrap full">
-                                    <label className="sd-label">🧓 Vulnerable Demographics: <strong>{vulnerablePct}%</strong> <span style={{ color: "#64748b", fontWeight: 400 }}>(elderly, children, care-dependent)</span></label>
+                                    <label className="sd-label">🧓 Vulnerable Demographics: <strong>{vulnerablePct}%</strong></label>
                                     <input className="sd-range" type="range" min="0" max="50" step="1" value={vulnerablePct} onChange={(e) => setVulnerablePct(e.target.value)} />
                                     <div className="sd-range-ends"><span>0%</span><span>50%</span></div>
                                 </div>
@@ -526,6 +670,74 @@ export function ScenarioDesigner({ onScenarioLaunched, onOpenLibrary }) {
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+                        )}
+
+                        {/* STRESS TEST & TIMELINE INJECTS TAB */}
+                        {activeSection === "STRESS_TEST" && (
+                            <div className="sd-form-section">
+                                <div className="sd-section-heading">
+                                    <span>📈</span> AI Stress-Testing & Casualty Forecast
+                                </div>
+                                <p style={{ color: "#94a3b8", fontSize: 13, marginBottom: 16 }}>
+                                    Simulate dynamic casualty surges over a 60-minute horizon, detect hospital ICU overload points,
+                                    and evaluate fleet exhaustion before launching.
+                                </p>
+
+                                <button
+                                    className="sd-btn sd-btn-validate"
+                                    onClick={handleRunStressTest}
+                                    disabled={runningStressTest}
+                                    style={{ marginBottom: 16 }}
+                                >
+                                    {runningStressTest ? <span className="sd-btn-spinner" /> : "🧪"} Run AI Stress-Test Simulation
+                                </button>
+
+                                {stressTestResult && (
+                                    <div className="stress-test-results-card">
+                                        <div className="sd-row-3" style={{ marginBottom: 16 }}>
+                                            <div className="stat-pill">
+                                                <span>Preparedness Score</span>
+                                                <strong style={{ color: stressTestResult.preparedness_score > 70 ? "#22c55e" : "#ef4444" }}>
+                                                    {stressTestResult.preparedness_score}/100
+                                                </strong>
+                                            </div>
+                                            <div className="stat-pill">
+                                                <span>Difficulty Rating</span>
+                                                <strong>{stressTestResult.difficulty_rating}</strong>
+                                            </div>
+                                            <div className="stat-pill">
+                                                <span>Primary Bottleneck</span>
+                                                <strong style={{ color: "#f59e0b" }}>{stressTestResult.primary_bottleneck}</strong>
+                                            </div>
+                                        </div>
+
+                                        <div className="sd-field-wrap full">
+                                            <label className="sd-label">⚡ Multi-Stage Injected Crisis Events (Timeline Injects)</label>
+                                            <div className="injects-timeline-grid">
+                                                {stressTestResult.cascading_timeline?.map((inj, idx) => (
+                                                    <div key={idx} className="inject-timeline-card">
+                                                        <div className="inject-time-badge">T+{inj.minute_mark}m</div>
+                                                        <div className="inject-info">
+                                                            <strong>{inj.title}</strong>
+                                                            <p>{inj.description}</p>
+                                                            <span>💥 Impact: {inj.impact_description}</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        <div className="sd-field-wrap full" style={{ marginTop: 16 }}>
+                                            <label className="sd-label">💡 AI Tactical Mitigation Directives</label>
+                                            <ul className="recs-list">
+                                                {stressTestResult.mitigation_recommendations?.map((r, idx) => (
+                                                    <li key={idx}>👉 {r}</li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         )}
 

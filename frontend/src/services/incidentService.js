@@ -106,6 +106,24 @@ export const incidentService = {
             params: { radius_km: radiusKm }
         });
         return response.data?.data || [];
+    },
+
+    /**
+     * AI Incident Commander Agent: Generate Incident Action Plan (IAP)
+     * POST /api/v1/agents/incident/{id}/iap
+     */
+    async getIncidentIAP(incidentId) {
+        const response = await api.post(`/agents/incident/${incidentId}/iap`);
+        return response.data?.data || null;
+    },
+
+    /**
+     * AI Incident Commander Agent: Dynamic Multi-Horizon Hazard Spread Envelopes
+     * POST /api/v1/agents/incident/{id}/hazard-envelope
+     */
+    async getHazardEnvelope(incidentId) {
+        const response = await api.post(`/agents/incident/${incidentId}/hazard-envelope`);
+        return response.data?.data || null;
     }
 };
 

@@ -72,6 +72,33 @@ export const missionService = {
     async updateAssignment(assignmentId, updateData) {
         const response = await api.put(`/assignments/${assignmentId}`, updateData);
         return response.data?.data || null;
+    },
+
+    /**
+     * AI Mission Operations Agent: Generate tactical SITREP
+     * POST /api/v1/agents/mission/{id}/sitrep
+     */
+    async getMissionSITREP(assignmentId) {
+        const response = await api.post(`/agents/mission/${assignmentId}/sitrep`);
+        return response.data?.data || null;
+    },
+
+    /**
+     * AI Mission Operations Agent: Generate Medevac Hospital recommendation
+     * POST /api/v1/agents/mission/{id}/medevac
+     */
+    async getMedevacRecommendation(assignmentId) {
+        const response = await api.post(`/agents/mission/${assignmentId}/medevac`);
+        return response.data?.data || null;
+    },
+
+    /**
+     * AI Mission Operations Agent: Batch Monitor all active missions
+     * GET /api/v1/agents/mission/monitor-all
+     */
+    async getMissionMonitorReport() {
+        const response = await api.get("/agents/mission/monitor-all");
+        return response.data?.data || null;
     }
 };
 

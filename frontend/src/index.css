@@ -4815,3 +4815,565 @@ body {
     animation: spin 0.7s linear infinite;
     display: inline-block;
 }
+
+/* ============================================================
+   MISSION CONTROL SUPERCHARGED STYLES
+   ============================================================ */
+.mission-filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.filter-chip {
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filter-chip:hover {
+    background: #334155;
+    color: #f8fafc;
+}
+
+.filter-chip.active {
+    background: #3b82f6;
+    color: white;
+    border-color: #60a5fa;
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+.mission-stepper {
+    display: flex;
+    justify-content: space-between;
+    margin: 12px 0 16px 0;
+    position: relative;
+    padding: 0 4px;
+}
+
+.mission-stepper::before {
+    content: "";
+    position: absolute;
+    top: 14px;
+    left: 20px;
+    right: 20px;
+    height: 2px;
+    background: #334155;
+    z-index: 0;
+}
+
+.step-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+    gap: 4px;
+}
+
+.step-circle {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #0f172a;
+    border: 2px solid #334155;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    transition: all 0.2s ease;
+}
+
+.step-text {
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 600;
+    text-align: center;
+    max-width: 60px;
+}
+
+.step-item.done .step-circle {
+    background: #059669;
+    border-color: #10b981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+.step-item.done .step-text {
+    color: #10b981;
+}
+
+.step-item.current .step-circle {
+    background: #2563eb;
+    border-color: #60a5fa;
+    box-shadow: 0 0 10px rgba(96, 165, 250, 0.6);
+    animation: pulse 1.5s infinite;
+}
+
+.step-item.current .step-text {
+    color: #93c5fd;
+    font-weight: 700;
+}
+
+.mission-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+}
+
+.action-btn.ai-sitrep-btn {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: white;
+}
+
+.action-btn.medevac-btn {
+    background: linear-gradient(135deg, #0284c7, #06b6d4);
+    color: white;
+}
+
+/* ── MODALS FOR SITREP, MEDEVAC, IAP ── */
+.sitrep-modal, .medevac-modal, .iap-modal {
+    max-width: 680px;
+    width: 90%;
+    max-height: 85vh;
+    overflow-y: auto;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    padding: 24px;
+    color: #f8fafc;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+}
+
+.sitrep-banner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e293b;
+    padding: 14px 18px;
+    border-radius: 8px;
+    border-left: 4px solid #6366f1;
+    margin-bottom: 16px;
+}
+
+.sitrep-banner h4 {
+    margin: 0 0 4px 0;
+    font-size: 16px;
+    color: #f1f5f9;
+}
+
+.sitrep-banner p {
+    margin: 0;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.sitrep-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    color: #cbd5e1;
+    text-align: right;
+}
+
+.sitrep-anomalies-section {
+    margin-bottom: 16px;
+}
+
+.sitrep-anomalies-section h5 {
+    margin: 0 0 8px 0;
+    font-size: 14px;
+    color: #f87171;
+}
+
+.anomaly-card {
+    background: #1e1e2d;
+    border: 1px solid #ef444455;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+}
+
+.anomaly-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.anomaly-badge {
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.anomaly-remedy {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #38bdf8;
+    font-weight: 500;
+}
+
+.milestone-timeline, .next-steps-list {
+    list-style: none;
+    padding: 0;
+    margin: 8px 0 16px 0;
+}
+
+.milestone-timeline li {
+    padding: 6px 0;
+    border-bottom: 1px solid #1e293b;
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.milestone-timeline li span {
+    color: #10b981;
+    font-weight: bold;
+    margin-right: 6px;
+}
+
+.next-steps-list li {
+    padding: 6px 0;
+    font-size: 13px;
+    color: #cbd5e1;
+}
+
+.backup-alert-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #451a03;
+    border: 1px solid #f97316;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 14px;
+}
+
+.request-backup-btn {
+    background: #f97316;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* ── MEDEVAC MODAL STYLES ── */
+.medevac-triage-card {
+    background: #1e293b;
+    padding: 14px;
+    border-radius: 8px;
+    border-left: 4px solid #0284c7;
+    margin-bottom: 16px;
+}
+
+.patient-count-badge {
+    display: inline-block;
+    margin-top: 6px;
+    background: #ef444433;
+    color: #f87171;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.hospital-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+}
+
+.hospital-card.best-facility {
+    border-color: #38bdf8;
+    background: #0c4a6e33;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.2);
+}
+
+.hosp-info h5 {
+    margin: 0 0 4px 0;
+    font-size: 15px;
+    color: #f1f5f9;
+}
+
+.hosp-info span {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.hosp-stats {
+    display: flex;
+    gap: 12px;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #cbd5e1;
+}
+
+.transfer-btn {
+    background: linear-gradient(135deg, #0284c7, #0ea5e9);
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.alt-transfer-btn {
+    background: #334155;
+    color: #f8fafc;
+    border: 1px solid #475569;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+/* ── IAP (INCIDENT ACTION PLAN) STYLES ── */
+.iap-commander-directive {
+    background: linear-gradient(135deg, #1e1b4b, #312e81);
+    border: 1px solid #6366f155;
+    border-radius: 10px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.iap-commander-directive h4 {
+    margin: 0 0 8px 0;
+    color: #a5b4fc;
+    font-size: 15px;
+}
+
+.iap-commander-directive p {
+    margin: 0 0 12px 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #e2e8f0;
+}
+
+.iap-meta-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.iap-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.iap-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 12px;
+}
+
+.iap-card h5 {
+    margin: 0 0 6px 0;
+    font-size: 13px;
+    color: #38bdf8;
+}
+
+.iap-card p {
+    margin: 4px 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.fleet-req-grid {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 6px;
+}
+
+.fleet-req-pill {
+    background: #0f172a;
+    border: 1px solid #475569;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #f1f5f9;
+}
+
+.cascade-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.cascade-card {
+    background: #1e293b;
+    border: 1px solid #f59e0b44;
+    border-radius: 8px;
+    padding: 10px;
+    font-size: 12px;
+}
+
+.cascade-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.cascade-prob {
+    color: #f59e0b;
+    font-weight: 700;
+}
+
+.objectives-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.objective-item {
+    background: #1e293b;
+    border-left: 3px solid #3b82f6;
+    border-radius: 6px;
+    padding: 8px 12px;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.objective-item.critical {
+    border-left-color: #ef4444;
+}
+
+.obj-phase-tag {
+    background: #0f172a;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.obj-main {
+    flex: 1;
+    color: #e2e8f0;
+}
+
+.obj-priority {
+    font-size: 10px;
+    font-weight: bold;
+    color: #f87171;
+}
+
+/* ── SCENARIO STUDIO PROMPTS & INJECTS ── */
+.sd-prompt-chips {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.sd-prompt-chip {
+    text-align: left;
+    background: #1e293b;
+    border: 1px solid #334155;
+    color: #94a3b8;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.sd-prompt-chip:hover {
+    background: #334155;
+    color: #f8fafc;
+    border-color: #60a5fa;
+}
+
+.stress-test-results-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.injects-timeline-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.inject-timeline-card {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+.inject-time-badge {
+    background: #f97316;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+.inject-info strong {
+    color: #f1f5f9;
+    font-size: 13px;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.inject-info p {
+    margin: 2px 0 4px 0;
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.inject-info span {
+    font-size: 11px;
+    color: #38bdf8;
+}
+
+.recs-list {
+    list-style: none;
+    padding: 0;
+    margin: 6px 0 0 0;
+}
+
+.recs-list li {
+    padding: 4px 0;
+    font-size: 12px;
+    color: #cbd5e1;
+}

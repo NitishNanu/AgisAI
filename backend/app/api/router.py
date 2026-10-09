@@ -12,6 +12,7 @@ from app.api.routes.disasters import router as disasters_router
 from app.api.routes.health import router as health_router
 from app.api.routes.missions import router as missions_router
 from app.modules.ai.router import router as ai_router
+from app.modules.ai.agents.router import router as agents_router
 from app.modules.analytics.router import router as analytics_router
 from app.modules.audit.router import router as audit_router
 from app.modules.auth.router import router as auth_router
@@ -53,6 +54,7 @@ api_router.include_router(
     prediction_router, prefix="/prediction", tags=["AI & Prediction Engine (Legacy Alias)"]
 )
 api_router.include_router(ai_router)
+api_router.include_router(agents_router)
 api_router.include_router(ml_router)
 api_router.include_router(assistant_router)
 
